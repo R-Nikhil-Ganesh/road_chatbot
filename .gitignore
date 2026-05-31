@@ -1,2 +1,4 @@
 .env
 backend/__pycache__/
+roadwatch_200_roads.csv
+roadwatch_contractors.csv
