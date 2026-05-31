@@ -107,6 +107,17 @@
                     <span>Chennai RoadWatch <span class="ai-badge">AI</span></span>
                 </div>
             </div>
+            
+            <!-- Dashboard Navigation Tabs -->
+            <div class="app-tabs">
+                <button id="tab-dashboard" class="tab-button active" data-tab="tab-dashboard-view">
+                    <i class="fa-solid fa-chart-line"></i> Interactive Dashboard
+                </button>
+                <button id="tab-complaints" class="tab-button" data-tab="tab-complaints-view">
+                    <i class="fa-solid fa-file-shield"></i> Complaints Portal
+                </button>
+            </div>
+            
             <div class="system-status">
                 <span class="status-indicator online"></span>
                 <span class="status-text">Database Active (SQLite)</span>
@@ -114,60 +125,196 @@
         </header>
 
         <div class="dashboard-body">
-            <!-- Left Side: Interactive Chennai Map -->
-            <div id="map-container" class="dashboard-panel">
-                <div class="panel-header">
-                    <h2><i class="fa-solid fa-map-location-dot"></i> Interactive Map (Chennai District)</h2>
-                    <div class="legend">
-                        <span class="legend-item"><span class="dot passed"></span> Passed</span>
-                        <span class="legend-item"><span class="dot warning"></span> Warning</span>
-                        <span class="legend-item"><span class="dot failed"></span> Failed</span>
+            <!-- TAB 1: INTERACTIVE DASHBOARD (Map & Chat) -->
+            <div id="tab-dashboard-view" class="tab-panel active">
+                <div class="split-layout">
+                    <!-- Left Side: Interactive Chennai Map -->
+                    <div id="map-container" class="dashboard-panel">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-map-location-dot"></i> Interactive Map (Chennai District)</h2>
+                            <div class="legend">
+                                <span class="legend-item"><span class="dot passed"></span> Passed</span>
+                                <span class="legend-item"><span class="dot warning"></span> Warning</span>
+                                <span class="legend-item"><span class="dot failed"></span> Failed</span>
+                            </div>
+                        </div>
+                        <div id="map"></div>
                     </div>
-                </div>
-                <div id="map"></div>
-            </div>
 
-            <!-- Right Side: AI Chat Assistant -->
-            <div id="chat-container" class="dashboard-panel">
-                <div class="panel-header">
-                    <h2><i class="fa-solid fa-robot"></i> AI Query Assistant</h2>
-                    <span class="helper-badge">Groq / Llama 3.3</span>
-                </div>
+                    <!-- Right Side: AI Chat Assistant -->
+                    <div id="chat-container" class="dashboard-panel">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-robot"></i> AI Query Assistant</h2>
+                            <span class="helper-badge">Groq / Llama 3.3</span>
+                        </div>
 
-                <!-- Chat history log -->
-                <div id="chat-log" class="chat-log">
-                    <div class="message system">
-                        <div class="message-content">
-                            <p>👋 **Welcome to Chennai RoadWatch AI!** I have loaded the audit records for **200 local roads** and the profile data for **30+ GCC contractors**.</p>
-                            <p>Here are some examples of what you can ask me:</p>
-                            <ul>
-                                <li><a href="#" class="suggested-query">Which contractors are currently blacklisted and why?</a></li>
-                                <li><a href="#" class="suggested-query">Show me roads that had a budget overrun.</a></li>
-                                <li><a href="#" class="suggested-query">Which contractor built Besant Canal Road? What is their phone number?</a></li>
-                                <li><a href="#" class="suggested-query">What is the performance rating of Sri Balaji Infrastructure?</a></li>
-                            </ul>
+                        <!-- Chat history log -->
+                        <div id="chat-log" class="chat-log">
+                            <div class="message system">
+                                <div class="message-content">
+                                    <p>👋 **Welcome to Chennai RoadWatch AI!** I have loaded the audit records for **200 local roads**, contractor profiles, and complaints database.</p>
+                                    <p>Here are some examples of what you can ask me:</p>
+                                    <ul>
+                                        <li><a href="#" class="suggested-query">Which contractors are currently blacklisted and why?</a></li>
+                                        <li><a href="#" class="suggested-query">Are there any complaints filed against Sri Balaji Infrastructure?</a></li>
+                                        <li><a href="#" class="suggested-query">Which contractor built Besant Canal Road? What is their phone number?</a></li>
+                                        <li><a href="#" class="suggested-query">What complaints have been filed for Rajiv Main Road?</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Loading Overlay -->
+                        <div id="chat-loader" class="chat-loader hidden">
+                            <div class="spinner"></div>
+                            <span>AI is querying the database...</span>
+                        </div>
+
+                        <!-- Input area -->
+                        <div class="chat-input-area">
+                            <div class="input-wrapper">
+                                <textarea id="chat-input" placeholder="Ask about road audits, budgets, complaints, contractor ratings..." rows="1"></textarea>
+                                <button id="btn-send" class="btn-send" title="Send Question">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Chat Loading Overlay -->
-                <div id="chat-loader" class="chat-loader hidden">
-                    <div class="spinner"></div>
-                    <span>AI is querying the database...</span>
-                </div>
+            <!-- TAB 2: COMPLAINTS PORTAL -->
+            <div id="tab-complaints-view" class="tab-panel">
+                <div class="complaints-grid-layout">
+                    
+                    <!-- Top section: Grievance Form & Live Directory Lookup -->
+                    <div class="complaints-top-row">
+                        <!-- Left Side: File Complaint Form -->
+                        <div class="complaints-form-panel card">
+                            <div class="panel-header">
+                                <h2><i class="fa-solid fa-pen-to-square"></i> 1. Specify Your Grievance</h2>
+                            </div>
+                            <form id="form-complaint" class="form-grid">
+                                <div class="form-group">
+                                    <label for="comp-road-select">Road Selection</label>
+                                    <select id="comp-road-select" required>
+                                        <option value="" disabled selected>Choose a road in Chennai...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comp-contractor">Responsible Contractor (Matched)</label>
+                                    <input type="text" id="comp-contractor" placeholder="No road selected" readonly required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comp-category">Audit Complaint Category</label>
+                                    <select id="comp-category" required>
+                                        <option value="" disabled selected>Select category...</option>
+                                        <option value="Potholes & Damaged Surface">Potholes & Damaged Surface</option>
+                                        <option value="Drainage & Waterlogging">Drainage & Waterlogging</option>
+                                        <option value="Substandard Material Usage">Substandard Material Usage</option>
+                                        <option value="Delay in Completion">Delay in Completion</option>
+                                        <option value="Safety Norm Violations">Safety Norm Violations</option>
+                                        <option value="Billing Discrepancy & Corruption">Billing Discrepancy & Corruption</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comp-severity">Severity Rating</label>
+                                    <select id="comp-severity" required>
+                                        <option value="Low">Low (Minor cosmetic defects)</option>
+                                        <option value="Medium" selected>Medium (Standard potholes / clogged drainage)</option>
+                                        <option value="High">High (Severe structural cracks / washouts / flooding)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="comp-description">Description of Issue</label>
+                                    <textarea id="comp-description" placeholder="Provide specific landmarks, impact on traffic, or details of substandard material observed..." rows="4" required></textarea>
+                                </div>
+                                <button type="submit" id="btn-submit-complaint" class="btn-primary full-width">
+                                    File Grievance & Route Ticket <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
 
-                <!-- Input area -->
-                <div class="chat-input-area">
-                    <div class="input-wrapper">
-                        <textarea id="chat-input" placeholder="Ask about road audits, budgets, contractor ratings..." rows="1"></textarea>
-                        <button id="btn-send" class="btn-send" title="Send Question">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
+                        <!-- Right Side: Grievance Officer Routing Info -->
+                        <div id="routing-preview-panel" class="complaints-preview-panel card">
+                            <div class="panel-header">
+                                <h2><i class="fa-solid fa-route"></i> 2. Grievance Escalation Directory</h2>
+                            </div>
+                            <div id="routing-preview-content" class="routing-preview-content">
+                                <div class="empty-preview-message">
+                                    <i class="fa-solid fa-circle-nodes"></i>
+                                    <p>Select a road and complaint category to see who to complain to and get a pre-drafted grievance letter.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom section: Recent Complaints Log -->
+                    <div class="complaints-log-panel card">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-receipt"></i> Routed Citizen Tickets Log</h2>
+                        </div>
+                        <div id="complaints-log-list" class="complaints-list">
+                            <!-- Cards will be populated dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Grievance Dossier Modal -->
+    <div id="dossier-modal" class="modal-overlay hidden">
+        <div class="modal-container card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-file-invoice"></i> Official Grievance Routing Slip</h2>
+                <button id="btn-close-modal" class="btn-icon-close" title="Close modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="routing-slip-highlight">
+                    <div class="ticket-status-row">
+                        <span id="modal-ticket-id" class="modal-ticket-id">COMP-2026-XXXX</span>
+                        <span id="modal-status-badge" class="status-badge">Routed & Assigned</span>
+                    </div>
+                    <table class="modal-routing-table">
+                        <tr>
+                            <th>Routed Agency</th>
+                            <td id="modal-agency">Quality Assurance Cell, PWD</td>
+                        </tr>
+                        <tr>
+                            <th>Escalation Officer</th>
+                            <td id="modal-officer">Er. S. Anbarasan</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Email</th>
+                            <td id="modal-email">pwd.qa@tn.gov.in</td>
+                        </tr>
+                        <tr>
+                            <th>Assigned Contractor</th>
+                            <td id="modal-contractor">-</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="dossier-letter-section">
+                    <label for="modal-letter-text"><strong>Citizen Grievance Letter Draft</strong></label>
+                    <p class="letter-instruction-text">Copy the pre-drafted text below to email the officer, or click "Send Email Direct" to open your mail application.</p>
+                    <textarea id="modal-letter-text" readonly rows="10"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-download-modal-dossier" class="btn-secondary">
+                    Download Dossier <i class="fa-solid fa-download"></i>
+                </button>
+                <button id="btn-copy-modal-letter" class="btn-secondary">
+                    Copy Letter <i class="fa-solid fa-copy"></i>
+                </button>
+                <a id="btn-send-modal-email" href="#" class="btn-primary">
+                    Send Email Direct <i class="fa-solid fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Leaflet Map Script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 

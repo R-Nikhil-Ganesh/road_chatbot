@@ -118,7 +118,50 @@ def init_db():
     roads_df.to_sql("roads", conn, if_exists="replace", index=False)
     contractors_df.to_sql("contractors", conn, if_exists="replace", index=False)
     
-    print(f"Database initialized. Loaded {len(roads_df)} roads and {len(contractors_df)} contractors.")
+    # Create complaints schema
+    cursor = conn.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS complaints (
+        complaint_id TEXT PRIMARY KEY,
+        road_name TEXT,
+        contractor_name TEXT,
+        category TEXT,
+        severity TEXT,
+        description TEXT,
+        status TEXT,
+        routed_department TEXT,
+        routing_officer TEXT,
+        contact_email TEXT,
+        created_at TEXT
+    )
+    """)
+    
+    # Seed mock complaints
+    cursor.execute("SELECT COUNT(*) FROM complaints")
+    if cursor.fetchone()[0] == 0:
+        mock_complaints = [
+            ("COMP-2026-0001", "Besant Canal Road", "Green Road Solutions Pvt. Ltd.", 
+             "Potholes & Damaged Surface", "Medium", 
+             "Significant pothole development observed near the intersection with Adyar Bridge Salai. It is causing traffic backups during peak hours.", 
+             "Investigation Initiated", "Road Infrastructure Division, GCC", 
+             "Dr. K. Ravichandran, Chief Engineer (General)", "gcc.roads@tn.gov.in", "2026-05-15 09:30:00"),
+            
+            ("COMP-2026-0002", "Jayalalithaa Avenue", "RK Road Works Pvt. Ltd.", 
+             "Drainage & Waterlogging", "High", 
+             "Severe waterlogging on the side drains. The drains are completely blocked with debris, causing runoff to overflow onto the roadway.", 
+             "Routed & Assigned", "Stormwater Drain Department, Greater Chennai Corporation (GCC)", 
+             "Dr. K. Ravichandran, Chief Engineer (General)", "gcc.drainage@tn.gov.in", "2026-05-20 14:15:00"),
+            
+            ("COMP-2026-0003", "Rajiv Main Road", "Sri Balaji Infrastructure Pvt. Ltd.", 
+             "Substandard Material Usage", "High", 
+             "Joint sealants missing at several locations. Concrete cracking observed within 3 months of completion. Suspect substandard concrete mix was used.", 
+             "Escalated - Blacklist Alert", "Quality Assurance Cell, Public Works Department (PWD), Tamil Nadu", 
+             "Er. S. Anbarasan, Superintending Engineer (Highways)", "pwd.qa@tn.gov.in", "2026-05-25 11:00:00")
+        ]
+        cursor.executemany("INSERT INTO complaints VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", mock_complaints)
+        conn.commit()
+    
+    print(f"Database initialized. Loaded {len(roads_df)} roads, {len(contractors_df)} contractors, and seeded complaints.")
 
 def run_query(sql_query: str) -> list[dict] | str:
     """Executes a SQL SELECT query on the in-memory database.

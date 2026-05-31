@@ -72,6 +72,20 @@ Columns:
 - `performance_issues_noted` (TEXT)
 - `empanelled_with` (TEXT) (e.g. 'NHAI | CMDA | PWD Tamil Nadu')
 
+3. Table: `complaints`
+Columns:
+- `complaint_id` (TEXT, e.g. 'COMP-2026-0001'): Primary key for the complaint ticket.
+- `road_name` (TEXT): Name of the road associated with the complaint. Links to `roads.road_name`.
+- `contractor_name` (TEXT): Name of the contractor. Links to `contractors.contractor_name`.
+- `category` (TEXT): Category of the complaint (e.g. 'Potholes & Damaged Surface', 'Drainage & Waterlogging', 'Substandard Material Usage', 'Delay in Completion', 'Safety Norm Violations', 'Billing Discrepancy & Corruption').
+- `severity` (TEXT): Severity level ('Low', 'Medium', 'High').
+- `description` (TEXT): Detailed description of the issue.
+- `status` (TEXT): Status of the complaint (e.g., 'Routed & Assigned', 'Investigation Initiated', 'Escalated - Blacklist Alert').
+- `routed_department` (TEXT): Resolved government department (e.g., 'Road Infrastructure Division, GCC', 'Quality Assurance Cell, PWD').
+- `routing_officer` (TEXT): Assigned escalation officer.
+- `contact_email` (TEXT): Department contact email address.
+- `created_at` (TEXT): Datetime string when filed.
+
 SQL Querying Tips:
 - Do NOT perform updates, inserts, deletes, or drop tables. Only write SELECT statements.
 - We have registered a custom SQLite function `NORMALIZE_SPELLING(text)` which makes matches spelling-insensitive (e.g. it collapses double letters like 'Meenambakkam' and 'Meenambakam' both to 'menabakam', and removes spaces and punctuation).
@@ -102,7 +116,7 @@ You are given the conversation history, the citizen's latest question, the SQL q
 Translate the SQL results into a polite, informative, citizen-friendly response.
 
 Guidelines:
-- Present the information clearly. If the result contains multiple rows, format them as a clean Markdown list or table.
+- Present the information clearly. If the SQL query returned multiple rows, metrics of roads, contractor comparisons, or complaint listings, ALWAYS format them as a clean Markdown table (using standard `| Column 1 | Column 2 |` syntax with separator dashes). Avoid using plain lists for multi-entity datasets.
 - Be precise. State only the facts returned by the database. Do not hallucinate details.
 - Convert large currency values to user-friendly formats if helpful (e.g., in Lakhs or Crores, where 1 Lakh = 100,000 INR and 1 Crore = 10,000,000 INR), but keep the exact numbers too.
 - If the SQL results are empty, politely state that no matching records were found in the database.
