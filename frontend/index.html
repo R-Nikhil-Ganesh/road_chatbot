@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chennai RoadWatch AI - Citizen Audit Portal</title>
+    <meta name="description" content="Empowering citizens with natural language audits and interactive mapping of Chennai road infrastructure budgets and contractor performance.">
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+          
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. PREMIUM LANDING PAGE -->
+    <section id="landing-page" class="active">
+        <div class="landing-background"></div>
+        <div class="landing-content">
+            <header class="landing-header">
+                <div class="logo">
+                    <i class="fa-solid fa-road-barrier logo-icon"></i>
+                    <span>Chennai RoadWatch <span class="ai-badge">AI</span></span>
+                </div>
+                <div class="header-links">
+                    <span class="system-badge"><span class="pulse-dot"></span> Live Citizen Database</span>
+                </div>
+            </header>
+
+            <main class="hero-section">
+                <h1 class="hero-title">Empowering Citizens through <br><span class="gradient-text">Road Infrastructure Transparency</span></h1>
+                <p class="hero-subtitle">
+                    Interact with Chennai's road construction, budget allocations, and contractor audit reports using simple conversational AI. Explore real-time audit mappings and contractor blacklists.
+                </p>
+                
+                <div class="cta-group">
+                    <button id="btn-launch" class="btn-primary">
+                        Launch Citizen Portal <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Live Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-num" id="stat-roads">200</div>
+                        <div class="metric-label">Roads Audited</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-num" id="stat-contractors">30+</div>
+                        <div class="metric-label">Contractors Monitored</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-num" id="stat-budget">₹900Cr+</div>
+                        <div class="metric-label">Budget Tracked</div>
+                    </div>
+                </div>
+
+                <!-- How It Works Section -->
+                <section class="features-preview">
+                    <h2>Platform Capabilities</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fa-solid fa-comments feature-icon"></i>
+                            <h3>Ask Natural Questions</h3>
+                            <p>Ask about budgets, overruns, audit statuses, or blacklisted contractors using everyday English.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fa-solid fa-map-location-dot feature-icon"></i>
+                            <h3>Explore Interactive Map</h3>
+                            <p>Click on roads across Chennai, filter by audit quality (Passed, Failed, Warnings), and query directly.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fa-solid fa-circle-check feature-icon"></i>
+                            <h3>Verify Contractors</h3>
+                            <p>Check ratings, contact numbers, pending dues, and blacklist histories for GCC empanelled contractors.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="landing-footer">
+                <p>© 2026 Chennai RoadWatch AI. Built for civic transparency & accountability.</p>
+            </footer>
+        </div>
+    </section>
+
+    <!-- 2. INTERACTIVE PORTAL DASHBOARD (Initially Hidden) -->
+    <section id="dashboard" class="hidden">
+        <header class="app-header">
+            <div class="app-logo">
+                <button id="btn-back" class="btn-icon" title="Return to Landing Page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="logo">
+                    <i class="fa-solid fa-road-barrier logo-icon"></i>
+                    <span>Chennai RoadWatch <span class="ai-badge">AI</span></span>
+                </div>
+            </div>
+            <div class="system-status">
+                <span class="status-indicator online"></span>
+                <span class="status-text">Database Active (SQLite)</span>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <!-- Left Side: Interactive Chennai Map -->
+            <div id="map-container" class="dashboard-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-map-location-dot"></i> Interactive Map (Chennai District)</h2>
+                    <div class="legend">
+                        <span class="legend-item"><span class="dot passed"></span> Passed</span>
+                        <span class="legend-item"><span class="dot warning"></span> Warning</span>
+                        <span class="legend-item"><span class="dot failed"></span> Failed</span>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <!-- Right Side: AI Chat Assistant -->
+            <div id="chat-container" class="dashboard-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-robot"></i> AI Query Assistant</h2>
+                    <span class="helper-badge">Groq / Llama 3.3</span>
+                </div>
+
+                <!-- Chat history log -->
+                <div id="chat-log" class="chat-log">
+                    <div class="message system">
+                        <div class="message-content">
+                            <p>👋 **Welcome to Chennai RoadWatch AI!** I have loaded the audit records for **200 local roads** and the profile data for **30+ GCC contractors**.</p>
+                            <p>Here are some examples of what you can ask me:</p>
+                            <ul>
+                                <li><a href="#" class="suggested-query">Which contractors are currently blacklisted and why?</a></li>
+                                <li><a href="#" class="suggested-query">Show me roads that had a budget overrun.</a></li>
+                                <li><a href="#" class="suggested-query">Which contractor built Besant Canal Road? What is their phone number?</a></li>
+                                <li><a href="#" class="suggested-query">What is the performance rating of Sri Balaji Infrastructure?</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Loading Overlay -->
+                <div id="chat-loader" class="chat-loader hidden">
+                    <div class="spinner"></div>
+                    <span>AI is querying the database...</span>
+                </div>
+
+                <!-- Input area -->
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <textarea id="chat-input" placeholder="Ask about road audits, budgets, contractor ratings..." rows="1"></textarea>
+                        <button id="btn-send" class="btn-send" title="Send Question">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaflet Map Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+            
+    <!-- Custom JS Application logic -->
+    <script src="app.js"></script>
+</body>
+</html>
